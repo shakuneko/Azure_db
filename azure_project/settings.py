@@ -15,7 +15,7 @@ LINE_CHANNEL_SECRET ='b2fe6bd914db38d47ebae432da6103a1'
 DEBUG = True
 
 # 指定允許訪問站點的主機名或 IP 地址
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
