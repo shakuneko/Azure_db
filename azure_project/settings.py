@@ -9,10 +9,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-2#p9z0-d=39&qbu#&f1p6m=2+j!a4_n_r9q%wz192hfwva&24^'
-
+LINE_CHANNEL_ACCESS_TOKEN = 'ZwazKlICYSdg5jBW8FYalkwqMui3gnbX9RUzDcn8mtHEehwY82QP3vW0mMR9Utm2mGDFSNOQAk3ZYHqswoROwXwYu0++1LwCRAu8DVH/Y4kyLuZRor8vxZg1EFaVHvESUeSwxmc9TAsOhYVSTqot3gdB04t89/1O/w1cDnyilFU='
+LINE_CHANNEL_SECRET ='b2fe6bd914db38d47ebae432da6103a1'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# 指定允許訪問站點的主機名或 IP 地址
 ALLOWED_HOSTS = []
 
 
@@ -25,9 +27,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'crispy_forms',
-    'azure_content.apps.AzureContentConfig', 
-    
+    'firstapp',
 ]
 
 MIDDLEWARE = [
