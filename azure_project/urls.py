@@ -7,5 +7,6 @@ urlpatterns = [
     re_path(r'^callback$',views.callback),
     path('admin/', admin.site.urls),
     path('', sayhello),
+    path('api/tasks/', views.create_task, name='create_task'),
    # path('', include('azure_content.urls')),
 ]
