@@ -41,9 +41,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
 ]
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',  # 允许来自该源的请求
-]
+CORS_ALLOW_ALL_ORIGINS = True
 ROOT_URLCONF = 'azure_project.urls'
 
 TEMPLATES = [
