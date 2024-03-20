@@ -30,7 +30,7 @@ def create_task(request):
             date=data['date'],
             category=data['category']
         )
-        return JsonResponse({'id': task.id, 'task_name': task.task_name, 'time': task.time, 'date': task.date, 'category': task.category})
+        return JsonResponse({'id': task.tid, 'task_name': task.task_name, 'time': task.time, 'date': task.date, 'category': task.category})
     else:
         return JsonResponse({'error': 'Only POST method allowed'})
     

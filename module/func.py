@@ -618,154 +618,131 @@ def sendList(event):
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text='發生錯誤！'))
         
 ###LIFF回傳
-# def manageForm(event, mtext):
-#     try:
-#         flist = mtext[3:].split('/')
-#         task_name = flist[0]
-#         task_date = flist[1]
-#         task_time = flist[2]
-#         task_category = flist[3]
-#         task_id = Task.objects.count() + 1
-#         formatted_time = datetime.strptime(task_time, '%H:%M').strftime('%H:%M:%S')
-#         unit = Task.objects.create(tid=task_id,task_name=task_name,date=task_date,time=task_time,category=task_category)
-#         unit.save()
-        
-#         #Flex Message
-#         flex_message = {
-#             "type": "carousel",
-#             "contents": [
-#                 {
-#                     "type": "bubble",
-#                     "size": "kilo",
-#                     "header": {
-#                         "type": "box",
-#                         "layout": "vertical",
-#                         "contents": [
-#                             {
-#                                 "type": "text",
-#                                 "text": "- 新增任務 -",
-#                                 "color": "#434343",
-#                                 "align": "center",
-#                                 "size": "md",
-#                                 "gravity": "center",
-#                                 "weight": "bold"
-#                             }
-#                         ],
-#                         "backgroundColor": "#FFF1B8",
-#                         "paddingTop": "19px",
-#                         "paddingAll": "12px",
-#                         "paddingBottom": "16px",
-#                         "spacing": "none"
-#                     },
-#                     "body": {
-#                         "type": "box",
-#                         "layout": "vertical",
-#                         "contents": [
-#                             {
-#                                 "type": "box",
-#                                 "layout": "vertical",
-#                                 "contents": [
-#                                     {
-#                                         "type": "text",
-#                                         "text": f"任務名稱：{task_name}",
-#                                         "color": "#434343",
-#                                         "size": "md",
-#                                         "wrap": True,
-#                                         "weight": "regular"
-#                                     }
-#                                 ],
-#                                 "flex": 1
-#                             },
-#                             {
-#                                 "type": "box",
-#                                 "layout": "vertical",
-#                                 "contents": [
-#                                     {
-#                                         "type": "text",
-#                                         "text": f"日期：{task_date}",
-#                                         "color": "#434343",
-#                                         "size": "sm",
-#                                         "wrap": True
-#                                     }
-#                                 ],
-#                                 "flex": 1
-#                             },
-#                             {
-#                                 "type": "box",
-#                                 "layout": "vertical",
-#                                 "contents": [
-#                                     {
-#                                         "type": "text",
-#                                         "text": f"預計執行時間：{task_time}",
-#                                         "color": "#434343",
-#                                         "size": "sm",
-#                                         "wrap": True
-#                                     }
-#                                 ],
-#                                 "flex": 1
-#                             },
-#                             {
-#                                 "type": "box",
-#                                 "layout": "vertical",
-#                                 "contents": [
-#                                     {
-#                                         "type": "text",
-#                                         "text": f"類別：{task_category}",
-#                                         "color": "#434343",
-#                                         "size": "sm",
-#                                         "wrap": True
-#                                     }
-#                                 ],
-#                                 "flex": 1
-#                             },
-#                             {
-#                                 "type": "button",
-#                                 "action": {
-#                                     "type": "message",
-#                                     "label": "修改",
-#                                     "text": "hello"
-#                                 },
-#                                 "margin": "xs"
-#                             }
-#                         ],
-#                         "spacing": "sm",
-#                         "paddingAll": "12px",
-#                         "margin": "none"
-#                     },
-#                     "styles": {
-#                         "footer": {
-#                             "separator": False
-#                         }
-#                     }
-#                 }
-#             ]
-#         }
-#         line_bot_api.reply_message(event.reply_token, [ FlexSendMessage(alt_text="新增任務", contents=flex_message)])
-        
-#     except Exception as e:
-#         print(f"Error saving task: {e}")
-#         line_bot_api.reply_message(event.reply_token,TextSendMessage(text='發生錯誤！'))   
-
-def create_task(event, mtext):
+def manageForm(event, mtext):
     try:
-        # 在这里处理 LIFF 发送的消息
-        # 从 LIFF 发送的消息中获取任务的相关信息
-        task_name = mtext['task']
-        task_date = mtext['date']
-        task_time = mtext['time']
-        task_category = mtext['category']
-
-        # 创建任务对象
-        task_id = Task.objects.count() + 1
+        flist = mtext[3:].split('/')
+        task_name = flist[0]
+        task_date = flist[1]
+        task_time = flist[2]
+        task_category = flist[3]
+        # task_id = Task.objects.count() + 1
+        formatted_time = datetime.strptime(task_time, '%H:%M').strftime('%H:%M:%S')
         unit = Task.objects.create(tid=task_id,task_name=task_name,date=task_date,time=task_time,category=task_category)
         unit.save()
-
-        # 创建回复消息内容
-        message = f"您添加的任务信息如下：\n任务名称：{task_name}\n日期：{task_date}\n时间：{task_time}\n类别：{task_category}"
-
-        # 使用 Line Bot API 发送消息给用户
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=message))
+        
+        #Flex Message
+        flex_message = {
+            "type": "carousel",
+            "contents": [
+                {
+                    "type": "bubble",
+                    "size": "kilo",
+                    "header": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                            {
+                                "type": "text",
+                                "text": "- 新增任務 -",
+                                "color": "#434343",
+                                "align": "center",
+                                "size": "md",
+                                "gravity": "center",
+                                "weight": "bold"
+                            }
+                        ],
+                        "backgroundColor": "#FFF1B8",
+                        "paddingTop": "19px",
+                        "paddingAll": "12px",
+                        "paddingBottom": "16px",
+                        "spacing": "none"
+                    },
+                    "body": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                            {
+                                "type": "box",
+                                "layout": "vertical",
+                                "contents": [
+                                    {
+                                        "type": "text",
+                                        "text": f"任務名稱：{task_name}",
+                                        "color": "#434343",
+                                        "size": "md",
+                                        "wrap": True,
+                                        "weight": "regular"
+                                    }
+                                ],
+                                "flex": 1
+                            },
+                            {
+                                "type": "box",
+                                "layout": "vertical",
+                                "contents": [
+                                    {
+                                        "type": "text",
+                                        "text": f"日期：{task_date}",
+                                        "color": "#434343",
+                                        "size": "sm",
+                                        "wrap": True
+                                    }
+                                ],
+                                "flex": 1
+                            },
+                            {
+                                "type": "box",
+                                "layout": "vertical",
+                                "contents": [
+                                    {
+                                        "type": "text",
+                                        "text": f"預計執行時間：{task_time}",
+                                        "color": "#434343",
+                                        "size": "sm",
+                                        "wrap": True
+                                    }
+                                ],
+                                "flex": 1
+                            },
+                            {
+                                "type": "box",
+                                "layout": "vertical",
+                                "contents": [
+                                    {
+                                        "type": "text",
+                                        "text": f"類別：{task_category}",
+                                        "color": "#434343",
+                                        "size": "sm",
+                                        "wrap": True
+                                    }
+                                ],
+                                "flex": 1
+                            },
+                            {
+                                "type": "button",
+                                "action": {
+                                    "type": "message",
+                                    "label": "修改",
+                                    "text": "hello"
+                                },
+                                "margin": "xs"
+                            }
+                        ],
+                        "spacing": "sm",
+                        "paddingAll": "12px",
+                        "margin": "none"
+                    },
+                    "styles": {
+                        "footer": {
+                            "separator": False
+                        }
+                    }
+                }
+            ]
+        }
+        line_bot_api.reply_message(event.reply_token, [ FlexSendMessage(alt_text="新增任務", contents=flex_message)])
         
     except Exception as e:
         print(f"Error saving task: {e}")
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='发生错误！'))
+        line_bot_api.reply_message(event.reply_token,TextSendMessage(text='發生錯誤！'))   
+
