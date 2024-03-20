@@ -63,8 +63,8 @@ def callback(request):
                     func.sendStory(event)
                 elif mtext == '成就列表':
                     func.sendList(event)
-                elif mtext[:3] =='###' and len(mtext) > 3:
-                    func.manageForm(event, mtext, user_id)
+                elif mtext.startswith('新增'):
+                    func.manageForm(event, mtext)
                     #func.manageRECEIPT(event, mtext, user_id)
 
     
@@ -85,6 +85,8 @@ def callback(request):
                     func.sendback_4(event, backdata)
                 elif backdata.get('action') == '第五章':
                     func.sendback_5(event, backdata)
+                elif backdata.get('action') == '日常':
+                    func.handle_quick_reply(event)
                         
         return HttpResponse()  
     

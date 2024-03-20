@@ -44,6 +44,7 @@ MIDDLEWARE = [
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',  # 允許從此網址發送的請求
+    'https://liffreact.vercel.app'
 ]
 CORS_ALLOW_METHODS = [
     'DELETE',
