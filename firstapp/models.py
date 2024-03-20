@@ -23,7 +23,7 @@ class booking(models.Model):
 
 #紀錄輸入的任務
 class Task(models.Model):
-    tid = models.AutoField(primary_key=True)
+    tid = models.CharField(max_length=50, default='0', null=False)
     task_name = models.CharField(max_length=255)
     time = models.TimeField(max_length=50,null=True, blank=True)
     date = models.DateField(max_length=50,null=True, blank=True)

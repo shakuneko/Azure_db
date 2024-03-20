@@ -625,7 +625,7 @@ def manageForm(event, mtext):
         task_date = flist[1]
         task_time = flist[2]
         task_category = flist[3]
-        # task_id = Task.objects.count() + 1
+        task_id = Task.objects.count() + 1
         formatted_time = datetime.strptime(task_time, '%H:%M').strftime('%H:%M:%S')
         unit = Task.objects.create(tid=task_id,task_name=task_name,date=task_date,time=task_time,category=task_category)
         unit.save()
