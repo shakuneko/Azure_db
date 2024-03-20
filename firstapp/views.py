@@ -24,10 +24,7 @@ def sayhello(request):
 def create_task(request):
     if request.method == 'POST':
         data = json.loads(request.body)
-        max_id = Task.objects.aggregate(Max('id'))['id__max']
-        new_id = max_id + 1 if max_id else 1  # 如果数据库中没有任务，则 id 设为 1
         task = Task.objects.create(
-            id=new_id,
             task_name=data['task'],
             time=data['time'],
             date=data['date'],
