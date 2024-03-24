@@ -190,6 +190,14 @@ def handle_postback(event):
                     message1 = TextSendMessage(text='恭喜！又完成一項任務啦～\n繼續努力吧！')
                     message2 = generate_experience_message(user,experience_newpercentage, level)
                     line_bot_api.reply_message(event.reply_token, [message1, message2])
+                    
+                completed_task_count = Task.objects.filter(completed=True).count()
+                if completed_task_count >= 3 and not user.reward_claimed:
+                    handle_all_tasks_completed(event.source.user_id)
+                    # 更新用户已领取奖励的标志
+                    user.reward_claimed = True
+                    user.save()
+                        
             else:
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text='該任務已經完成過了！'))
         except Task.DoesNotExist:
@@ -262,17 +270,11 @@ def get_gift(event):
                 "layout": "vertical",
                 "contents": [
                     {
-                        "type": "button",
-                        "style": "primary",
-                        "height": "md",
-                        "action": {
-                            "type": "uri",
-                            "label": "確認",
-                            "uri": "https://example.com/shield_details"
-                        },
-                        "color": "#597EF7"
+                        "type": "filler"
                     }
-                ]
+                ],
+                "backgroundColor": "#FFFFFF",
+                "paddingAll": "10px" 
             }
         }
 
