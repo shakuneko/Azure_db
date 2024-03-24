@@ -12,7 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from module.func import sendMission, handle_postback
 from urllib.parse import parse_qsl
 from firstapp.models import users
-from .models import Task
+from .models import Task,UserGift
 import json
 line_bot_api = LineBotApi(settings.LINE_CHANNEL_ACCESS_TOKEN)
 parser = WebhookParser(settings.LINE_CHANNEL_SECRET)
@@ -33,8 +33,22 @@ def create_task(request):
         return JsonResponse({'id': task.tid, 'task_name': task.task_name, 'time': task.time, 'date': task.date, 'category': task.category})
     else:
         return JsonResponse({'error': 'Only POST method allowed'})
-    
-    
+#把任務的資料給前端
+def get_tasks(request):
+    if request.method == 'GET':
+        tasks = Task.objects.all()
+        task_data = [{'id': task.tid, 'task_name': task.task_name, 'time': task.time, 'date': task.date, 'category': task.category,'completed': task.completed} for task in tasks]
+        return JsonResponse(task_data, safe=False)
+    else:
+        return JsonResponse({'error': 'Only GET method allowed'})
+#把道具的任務給前端
+def get_item(request):
+    if request.method == 'GET':
+        items = UserGift.objects.all()
+        item_data = [{'item_name': item.gift.giftname, 'item_url': item.image_url} for item in items]
+        return JsonResponse(item_data, safe=False)
+    else:
+        return JsonResponse({'error': 'Only GET method allowed'})
 @csrf_exempt
 def callback(request):
     if request.method == 'POST':
@@ -63,9 +77,14 @@ def callback(request):
                     func.sendStory(event)
                 elif mtext == '成就列表':
                     func.sendList(event)
+                elif mtext == '我要選擇勇者！':
+                    func.sendUsername(event)    
                 elif mtext.startswith('新增'):
                     func.manageForm(event, mtext)
                     #func.manageRECEIPT(event, mtext, user_id)
+                elif mtext.startswith("我想叫"):
+                    func.sendnickname(event, mtext)
+
 
     
             elif isinstance(event, PostbackEvent):

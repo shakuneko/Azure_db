@@ -1,20 +1,14 @@
 from django.contrib import admin
-from firstapp.models import users
-from firstapp.models import booking
-from firstapp.models import Task
-from firstapp.models import Gift
-from firstapp.models import UserGift
+from firstapp.models import users,Task,Gift,UserGift,CompletedTask,UserLevel
+
 
 class usersAdmin(admin.ModelAdmin):
-    list_display=('uid','datatest','created_time')
+    list_display=('uid','datatest','created_time','experience','level','reward_claimed','nickname','image_url')
 admin.site.register(users, usersAdmin)
 # Register your models here.
-class bookingAdmin(admin.ModelAdmin):
-    list_display=('bid','datatest','exhibittype','exhibitamount','money','which_date','which_time')
-admin.site.register(booking, bookingAdmin)
 
 class TaskAdmin(admin.ModelAdmin):
-    list_display=('tid','task_name','time','date','category')
+    list_display=('tid','task_name','time','date','category','completed')
 admin.site.register(Task, TaskAdmin)
 
 class GiftAdmin(admin.ModelAdmin):
@@ -22,5 +16,13 @@ class GiftAdmin(admin.ModelAdmin):
 admin.site.register(Gift, GiftAdmin)
 
 class UserGiftAdmin(admin.ModelAdmin):
-    list_display=('user','gift','created_at')
+    list_display=('user','gift','created_at','image_url')
 admin.site.register(UserGift, UserGiftAdmin)
+
+class CompletedTaskAdmin(admin.ModelAdmin):
+    list_display=('user_id','task_id')
+admin.site.register(CompletedTask, CompletedTaskAdmin)
+
+class UserLevelAdmin(admin.ModelAdmin):
+    list_display=('level','image_url')
+admin.site.register(UserLevel, UserLevelAdmin)

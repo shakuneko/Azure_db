@@ -4,22 +4,14 @@ class users(models.Model):
     uid = models.CharField(max_length=50,null=False)
     datatest = models.CharField(max_length=50,null=False,default='0')
     created_time = models.DateTimeField(auto_now=True)
-    
+    experience = models.IntegerField(default=0)
+    level = models.IntegerField(default=1)
+    reward_claimed = models.BooleanField(default=False)
+    nickname = models.CharField(max_length=255)
+    image_url = models.URLField(blank=True, null=True)
+
     def _str_(self):
         return self.uid
-    
-class booking(models.Model):
-    bid = models.CharField(max_length=50, default='0', null=False)
-    datatest = models.CharField(max_length=50,null=False,default='0')
-    exhibittype = models.CharField(max_length=20,null=False)
-    exhibitamount = models.CharField(max_length=5,null=False)
-    money = models.CharField(max_length=50, default='0', null=False)
-    #created_time = models.DateTimeField(auto_now=True)
-    which_date =  models.DateField(auto_now=True)
-    which_time =  models.TimeField(auto_now=True)
-    
-    def _str_(self):
-        return self.bid
 
 #紀錄輸入的任務
 class Task(models.Model):
@@ -28,6 +20,7 @@ class Task(models.Model):
     time = models.TimeField(max_length=50,null=True, blank=True)
     date = models.DateField(max_length=50,null=True, blank=True)
     category = models.CharField(max_length=100, null=True, blank=True)
+    completed = models.BooleanField(default=False)  # 新增字段表示任务是否完成
 
     def __str__(self):
         return self.tid
@@ -44,4 +37,18 @@ class Gift(models.Model):
 class UserGift(models.Model):
     user = models.CharField(max_length=255)  # 假设您的用户ID是一个字符串类型
     gift = models.ForeignKey(Gift, on_delete=models.CASCADE)  # 关联到您的 Gift 模型
+    image_url = models.URLField()
     created_at = models.DateTimeField(auto_now_add=True)  # 自动记录创建时间
+
+#紀錄完成的任務id
+class CompletedTask(models.Model):
+    user_id = models.CharField(max_length=100)  # 用戶ID
+    task_id = models.CharField(max_length=100)  # 任務ID
+
+#紀錄等級對應的圖片
+class UserLevel(models.Model):
+    level = models.IntegerField(unique=True)
+    image_url = models.URLField()
+
+    def __str__(self):
+        return f"Level {self.level}"
