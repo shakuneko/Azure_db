@@ -71,7 +71,7 @@ def generate_carousel(tasks):
                         "action": {
                         "type": "postback",
                         "label": "刪除",
-                        "data": "action=incompleted"
+                        "data": "action=incompleted"+ task.tid
                         },
                         "color": "#496496"
                     }
@@ -180,14 +180,22 @@ def handle_postback(event):
                 update_experience(user, experience_gained)  # 更新用户的经验值
                 experience_newpercentage = user.experience  # 获取用户当前的经验值百分比
                 level = user.level
+                # 隨機恭喜句子
+                congrats_messages = [
+                    '恭喜！又完成一項任務啦～\n繼續努力吧！',
+                    '加油！快要升等了',
+                    '恭喜完成任務！'
+                ]
+                congrats_message = random.choice(congrats_messages)
+
                 if user.level > 1 and user.experience == 0:
-                    message = f'恭喜！升级到 {user.level}等了！'
+                    message = f'恭喜！升级到 {user.level}等了！\n成就列表查看狀態吧！'
                     image_url = user.image_url  # 新的级别图片URL
                     flex_message = generate_level_up_message(message, image_url)
                     message2 = generate_experience_message(user,experience_newpercentage, level)
                     line_bot_api.reply_message(event.reply_token, [flex_message,message2])
                 else:
-                    message1 = TextSendMessage(text='恭喜！又完成一項任務啦～\n繼續努力吧！')
+                    message1 = TextSendMessage(text=congrats_message)
                     message2 = generate_experience_message(user,experience_newpercentage, level)
                     line_bot_api.reply_message(event.reply_token, [message1, message2])
                     
@@ -204,6 +212,17 @@ def handle_postback(event):
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='發生錯誤'))
     elif postback_data.startswith('action=open_treasure_box'):
         get_gift(event)
+    #刪除任務
+    elif postback_data.startswith('action=incompleted'):
+        task_id = postback_data.split('action=incompleted')[1] 
+        print("Received postback data:", postback_data)
+        print("Received postback data:", task_id)
+        try:
+            task = Task.objects.get(tid=task_id)
+            task.delete()
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='任務已刪除！'))
+        except Task.DoesNotExist:
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='任務不存在'))
 
 def handle_all_tasks_completed(user_id):
     # 在這裡添加您希望在所有任務完成時執行的代碼
@@ -556,11 +575,6 @@ def sendList(event):
                 "type": "image",
                 "url": user.image_url,
                 "size": "full",
-
-                "action": {
-                  "type": "uri",
-                  "uri": "http://linecorp.com/"
-                }
               },
               "body": {
                 "type": "box",
