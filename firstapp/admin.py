@@ -12,11 +12,11 @@ class TaskAdmin(admin.ModelAdmin):
 admin.site.register(Task, TaskAdmin)
 
 class GiftAdmin(admin.ModelAdmin):
-    list_display=('giftname','image_url')
+    list_display=('giftname','image_url','description')
 admin.site.register(Gift, GiftAdmin)
 
 class UserGiftAdmin(admin.ModelAdmin):
-    list_display=('user','gift','created_at','image_url')
+    list_display=('user','gift','created_at','image_url','description')
 admin.site.register(UserGift, UserGiftAdmin)
 
 class CompletedTaskAdmin(admin.ModelAdmin):

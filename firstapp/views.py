@@ -45,7 +45,7 @@ def get_tasks(request):
 def get_item(request):
     if request.method == 'GET':
         items = UserGift.objects.all()
-        item_data = [{'item_name': item.gift.giftname, 'item_url': item.image_url} for item in items]
+        item_data = [{'item_name': item.gift.giftname, 'item_url': item.image_url,'description':item.description} for item in items]
         return JsonResponse(item_data, safe=False)
     else:
         return JsonResponse({'error': 'Only GET method allowed'})
@@ -75,6 +75,16 @@ def callback(request):
                     func.sendTimeBox(event)
                 elif mtext == '冒險故事':
                     func.sendStory(event)
+                elif mtext.startswith("我要繼續前進！"):
+                    func.sendStoryNext(event, mtext)
+                elif mtext.startswith("先不要好了"):
+                    func.sendStoryBack(event, mtext)
+                elif mtext.startswith("逃跑"):
+                    func.sendStoryBack(event, mtext)
+                elif mtext.startswith("用看看道具好了"):
+                    func.sendStoryUseItem(event, mtext)
+                elif mtext.startswith("使用"):
+                    func.sendStoryItem(event)
                 elif mtext == '成就列表':
                     func.sendList(event)
                 elif mtext == '我要選擇勇者！':
@@ -86,7 +96,6 @@ def callback(request):
                     func.sendnickname(event, mtext)
 
 
-    
             elif isinstance(event, PostbackEvent):
                 handle_postback(event)
                 
@@ -99,11 +108,11 @@ def callback(request):
                 elif backdata.get('action') == '第二章':
                      func.sendback_2(event, backdata)
                 elif backdata.get('action') == '第三章':
-                    func.sendback_3(event, backdata)
+                    func.sendback_2(event, backdata)
                 elif backdata.get('action') == '第四章':
-                    func.sendback_4(event, backdata)
+                    func.sendback_2(event, backdata)
                 elif backdata.get('action') == '第五章':
-                    func.sendback_5(event, backdata)
+                    func.sendback_2(event, backdata)
                 elif backdata.get('action') == '日常':
                     func.handle_quick_reply(event)
                         

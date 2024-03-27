@@ -259,7 +259,7 @@ def get_gift(event):
         # 从剩余的礼物中随机选择一个
         selected_gift = random.choice(available_gifts)
         # 创建一个 UserGift 实例，将其与用户关联并保存到数据库中
-        user_gift = UserGift.objects.create(user=event.source.user_id, gift=selected_gift,image_url=selected_gift.image_url)
+        user_gift = UserGift.objects.create(user=event.source.user_id, gift=selected_gift,image_url=selected_gift.image_url,description=selected_gift.description)
         user_gift.save()
         # 更新用戶的reward_claimed屬性為True，表示用戶已經領取了獎勵
         user = users.objects.get(uid=event.source.user_id)
@@ -283,6 +283,21 @@ def get_gift(event):
                 "url": selected_gift.image_url,
                 "size": "4xl",
                 "aspectMode": "cover"
+            },
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                    {
+                        "type": "separator",
+                        "margin": "md"
+                    },
+                    {
+                        "type": "text",
+                        "text": f"道具說明: {selected_gift.description}",
+                        "margin": "md"
+                    }
+                ]
             },
             "footer": {
                 "type": "box",
@@ -545,21 +560,238 @@ def sendStory(event):
         
 def sendback_1(event, backdata):  
     try:
-       text1 = TextSendMessage(text='<第一章> - 收服夥伴吧！')
-       text2 = TextSendMessage(text='離開了新手村，首先映入眼簾的是一隻奇怪的兔子，他看起來肚子很餓，苦苦哀求的看著你...')
-       # 圖片
-       image_url = "https://png.pngtree.com/png-vector/20221222/ourmid/pngtree-super-cute-cartoon-vector-bear-png-image_6504049.png"
-       image_message = ImageSendMessage(original_content_url=image_url, preview_image_url=image_url)
-   
-       flex_message = FlexSendMessage(
-           alt_text='今日任務',
-           contents=generate_carousel2(chapter) # 生成包含多個任務的 Carousel Flex Message
-       )
+       text1 = TextSendMessage(text='<第一章> - 冒險的開始！')
+       text2 = TextSendMessage(text='離開了新手村，你來到了一片森林，聽說這裡充滿了各種危險，你做好準備前進下去了嗎？')
+       flex_message1 = FlexSendMessage(
+        alt_text='是否繼續',
+        contents={
+            "type": "bubble",
+            "body": {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                            {
+                                "type": "button",
+                                "action": {
+                                    "type": "message",
+                                    "label": "繼續前進",
+                                    "text": "我要繼續前進！"
+                                },
+                                "color": "#ffffff"
+                            }
+                        ],
+                        "backgroundColor": "#597EF7",
+                        "cornerRadius": "lg"
+                    },
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                            {
+                                "type": "button",
+                                "action": {
+                                    "type": "message",
+                                    "label": "先不要好了",
+                                    "text": "先不要好了"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    )
 
-       line_bot_api.reply_message(event.reply_token, [text1, text2, image_message, flex_message])
+    #    flex_message = FlexSendMessage(
+    #        alt_text='今日任務',
+    #        contents=generate_carousel2(chapter) # 生成包含多個任務的 Carousel Flex Message
+    #    )
+
+       line_bot_api.reply_message(event.reply_token, [text1, text2,flex_message1])
 
     except:
        line_bot_api.reply_message(event.reply_token,TextSendMessage(text='不'))
+
+def sendback_2(event, backdata):  
+    try:
+       text = TextSendMessage(text='目前尚未解鎖該章節，3等後就能查看囉！')
+       line_bot_api.reply_message(event.reply_token, [text])
+    except:
+       line_bot_api.reply_message(event.reply_token,TextSendMessage(text='不'))
+
+def sendStoryNext(event, backdata): 
+    try:
+       text1 = TextSendMessage(text='突然，一隻史萊姆出現在你的眼前，該怎麼做呢...')
+        # 圖片
+       image_url = "https://i.imgur.com/loFy9Ut.png"
+       image_message = ImageSendMessage(original_content_url=image_url, preview_image_url=image_url)
+       flex_message1 = FlexSendMessage(
+        alt_text='是否使用道具',
+        contents={
+            "type": "bubble",
+            "body": {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                            {
+                                "type": "button",
+                                "action": {
+                                    "type": "message",
+                                    "label": "使用道具",
+                                    "text": "用看看道具好了"
+                                },
+                                "color": "#ffffff"
+                            }
+                        ],
+                        "backgroundColor": "#597EF7",
+                        "cornerRadius": "lg"
+                    },
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                            {
+                                "type": "button",
+                                "action": {
+                                    "type": "message",
+                                    "label": "逃跑",
+                                    "text": "逃跑"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    )
+
+   
+    #    flex_message = FlexSendMessage(
+    #        alt_text='今日任務',
+    #        contents=generate_carousel2(chapter) # 生成包含多個任務的 Carousel Flex Message
+    #    )
+
+       line_bot_api.reply_message(event.reply_token, [text1,image_message,flex_message1])
+
+    except Exception as e:
+        print(f"Error saving task: {e}")
+        line_bot_api.reply_message(event.reply_token,TextSendMessage(text='不'))
+def sendStoryUseItem(event, backdata): 
+    try:
+        user_id = event.source.user_id  
+        user_gifts = UserGift.objects.filter(user=user_id) 
+        
+        bubbles = []
+        for user_gift in user_gifts:
+            bubble = {
+                "type": "bubble",
+                "body": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                        {
+                            "type": "image",
+                            "url": user_gift.image_url,
+                            "size": "3xl"
+                        },
+                        {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [
+                                {
+                                    "type": "text",
+                                    "text": user_gift.gift.giftname,
+                                    "weight": "bold",
+                                    "size": "lg",
+                                    "align": "center",
+                                    "margin": "md"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "footer": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "spacing": "sm",
+                    "contents": [
+                        {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [
+                                {
+                                    "type": "button",
+                                    "action": {
+                                        "type": "message",
+                                        "label": "使用",
+                                        "text": f"使用{user_gift.gift.giftname}"  # 不同道具的標識
+                                    },
+                                    "color": "#ffffff"
+                                }
+                            ],
+                            "backgroundColor": "#597EF7",
+                            "cornerRadius": "md"
+                        }
+                    ],
+                    "flex": 0
+                }
+            }
+            bubbles.append(bubble)
+
+        carousel = {
+            "type": "carousel",
+            "contents": bubbles
+        }
+
+        flex_message = FlexSendMessage(alt_text='是否使用道具', contents=carousel)
+
+        line_bot_api.reply_message(event.reply_token, flex_message)
+    except Exception as e:
+        print(f"Error sending story use item message: {e}")
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text="發生錯誤"))
+
+def sendStoryItem(event):
+    try:
+        message = event.message.text
+        gift_name = message.split("使用")[1].strip()  # 獲取道具名稱並去除前後空格
+
+        if gift_name == "盾牌":
+            response_message = "你使用了水果，史萊姆的顏色逐漸變化了！"
+            image_url = "https://i.imgur.com/loFy9Ut.png"  # 請替換為水果圖片的URL
+            congratulation_message = "他很喜歡，恭喜獲得一隻史萊姆！"
+            # 生成消息回覆
+            messages = [
+                TextSendMessage(text=response_message),
+                ImageSendMessage(original_content_url=image_url, preview_image_url=image_url),
+                TextSendMessage(text=congratulation_message)
+            ]
+        elif gift_name == "魔法藥水":
+            response_message = "你使用了魔法藥水，史萊姆縮水了！"
+            image_url = "https://i.imgur.com/loFy9Ut.png"  # 請替換為魔法藥水圖片的URL
+            dislike_message = "他不喜歡這個藥水，所以跑走了。"
+            # 生成消息回覆
+            messages = [
+                TextSendMessage(text=response_message),
+                ImageSendMessage(original_content_url=image_url, preview_image_url=image_url),
+                TextSendMessage(text=dislike_message)
+            ]
+        else:
+            response_message = "你使用了未知的道具。"
+            messages = [TextSendMessage(text=response_message)]
+
+        line_bot_api.reply_message(event.reply_token, messages)
+    except Exception as e:
+        print(f"Error handling message: {e}")
+
+
 
 ###成就列表
 def sendList(event):
