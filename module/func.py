@@ -1090,6 +1090,35 @@ def sendUsername(event):
         print(f"Error sending mission: {e}")
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text='发生错误！'))
 
+#圖片選轉木馬
+def generate_carousel(images):
+    carousel_contents = []
+    for image_url in images:
+        bubble = {
+            "type": "bubble",
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                    {
+                        "type": "image",
+                        "url": image_url,
+                        "size": "full",
+                        "aspectMode": "cover",
+                        "aspectRatio": "2:3",
+                        "gravity": "top"
+                    }
+                ],
+                "paddingAll": "0px"
+            }
+        }
+        carousel_contents.append(bubble)
+    carousel = {
+        "type": "carousel",
+        "contents": carousel_contents
+    }
+    return carousel
+
 def sendnickname(event,mtext):
     try:
         user_id = event.source.user_id
@@ -1103,52 +1132,42 @@ def sendnickname(event,mtext):
         nickname = mtext[3:].strip()  # 取得使用者輸入的暱稱部分，并移除首尾空格
         user.nickname = nickname
         user.save()
-        reply_message = TextSendMessage(text=f'好的，{nickname}\n那麼接下來要進入新手教學的部分，如果看完有不懂的地方或是忘記的話，隨時輸入“新手教學”我就會再教你一次喔！')
-        flex_message = {
-            "type": "carousel",
-            "contents": [
-                {
-                    "type": "bubble",
-                    "size": "micro",
-                    "hero": {
-                        "type": "image",
-                        "url": "https://scdn.line-apps.com/n/channel_devcenter/img/flexsnapshot/clip/clip10.jpg",
-                        "size": "full",
-                        "aspectMode": "cover",
-                        "aspectRatio": "1:1",
-                        "gravity": "center"
-                    }
-                },
-                {
-                    "type": "bubble",
-                    "size": "micro",
-                    "hero": {
-                        "type": "image",
-                        "url": "https://scdn.line-apps.com/n/channel_devcenter/img/flexsnapshot/clip/clip12.jpg",
-                        "size": "full",
-                        "aspectMode": "cover",
-                        "aspectRatio": "1:1"
-                    }
-                },
-                {
-                    "type": "bubble",
-                    "size": "micro",
-                    "hero": {
-                        "type": "image",
-                        "url": "https://scdn.line-apps.com/n/channel_devcenter/img/flexsnapshot/clip/clip12.jpg",
-                        "size": "full",
-                        "aspectMode": "cover",
-                        "aspectRatio": "1:1"
-                    }
-                }
-            ]
-        }
-        flex_message_object = FlexSendMessage(alt_text="carousel", contents=flex_message)
+        reply_message = TextSendMessage(text=f'好的，{nickname}\n那麼接下來要進入新手教學的部分，如果看完有不懂的地方或是忘記的話，隨時點擊“新手教學”我就會再教你一次喔！')
+        images = [
+            "https://imgur.com/lrzzCB1.png",
+            "https://imgur.com/UDTAWhX.png",
+            "https://imgur.com/cicOATM.png",
+            "https://imgur.com/lTG4SQi.png",
+            "https://imgur.com/Hd9dwxU.png",
+            "https://imgur.com/rl4kn8q.png",
+            "https://imgur.com/5tn2U7t.png",
+            "https://imgur.com/oHQdgW3.png",
+        ]
+        carousel_message = generate_carousel(images)
+        flex_message_object = FlexSendMessage(alt_text="carousel", contents=carousel_message)
         line_bot_api.reply_message(event.reply_token, [reply_message, flex_message_object])
     except Exception as e:
         print(f"Error sending mission: {e}")
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text='发生错误！'))
-
+###新手教學
+def sendTeach(event):
+    try:
+        images = [
+            "https://imgur.com/lrzzCB1.png",
+            "https://imgur.com/UDTAWhX.png",
+            "https://imgur.com/cicOATM.png",
+            "https://imgur.com/lTG4SQi.png",
+            "https://imgur.com/Hd9dwxU.png",
+            "https://imgur.com/rl4kn8q.png",
+            "https://imgur.com/5tn2U7t.png",
+            "https://imgur.com/oHQdgW3.png",
+        ]
+        carousel_message = generate_carousel(images)
+        flex_message_object = FlexSendMessage(alt_text="carousel", contents=carousel_message)
+        line_bot_api.reply_message(event.reply_token, [flex_message_object])
+    except Exception as e:
+        print(f"Error sending mission: {e}")
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='发生错误！'))
 
  ###自我回顧
 def sendReview(event):
@@ -1269,6 +1288,7 @@ def sendReview(event):
 ###任務整理
 def sendLeftList(event):
     try:
+        text = TextSendMessage(text='昨天還遺留了一些任務...\n今天還要繼續完成嗎？')
         List = FlexSendMessage(
             alt_text='任務整理',
             contents={
@@ -1336,7 +1356,7 @@ def sendLeftList(event):
                 }
             }
         )
-        line_bot_api.reply_message(event.reply_token, List)
+        line_bot_api.reply_message(event.reply_token, [text,List])
 
     except Exception as e:
         print(f"Error sending mission: {e}")

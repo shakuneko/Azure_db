@@ -87,6 +87,8 @@ def callback(request):
                     func.sendStoryItem(event)
                 elif mtext == '成就列表':
                     func.sendList(event)
+                elif mtext == '新手教學':
+                    func.sendTeach(event)
                 elif mtext == '自我回顧':
                     func.sendReview(event)
                 elif mtext == '任務整理':
