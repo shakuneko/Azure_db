@@ -189,7 +189,7 @@ def handle_postback(event):
                 congrats_message = random.choice(congrats_messages)
 
                 if user.level > 1 and user.experience == 0:
-                    message = f'恭喜！升级到 {user.level}等了！\n成就列表查看狀態吧！'
+                    message = f'恭喜！升级到 {user.level}等了！\n快到成就列表查看狀態吧！'
                     image_url = user.image_url  # 新的级别图片URL
                     flex_message = generate_level_up_message(message, image_url)
                     message2 = generate_experience_message(user,experience_newpercentage, level)
@@ -231,7 +231,7 @@ def handle_all_tasks_completed(user_id):
         "type": "bubble",
         "hero": {
             "type": "image",
-            "url": "https://img.freepik.com/premium-vector/wooden-treasure-box-pirate-isolated-vector-illustration_509778-62.jpg?w=740",
+            "url": "https://imgur.com/luxUvdb.png",
             "size": "full",
             "aspectRatio": "20:13",
             "aspectMode": "cover",
@@ -282,7 +282,7 @@ def get_gift(event):
                 "type": "image",
                 "url": selected_gift.image_url,
                 "size": "4xl",
-                "aspectMode": "cover"
+                "aspectMode": "cover",
             },
             "body": {
                 "type": "box",
@@ -294,8 +294,9 @@ def get_gift(event):
                     },
                     {
                         "type": "text",
-                        "text": f"道具說明: {selected_gift.description}",
-                        "margin": "md"
+                        "text": f"道具說明:\n {selected_gift.description}",
+                        "margin": "md",
+                        "wrap": True  # 啟用文字自動換行功能
                     }
                 ]
             },
@@ -351,6 +352,7 @@ def generate_level_up_message(message, image_url):
                 "aspectRatio": "1:1",
                 "aspectMode": "cover"
             },
+
             "body": {
                 "type": "box",
                 "layout": "vertical",
@@ -539,7 +541,6 @@ def sendTimeBox(event):
         print(f"Error sending mission: {e}")
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text='发生错误！'))
 ###冒險故事
-chapter = ["要給他紅蘿菠嗎？"]
 def sendStory(event):
     try:
         # 快速回覆按鈕
@@ -562,6 +563,9 @@ def sendback_1(event, backdata):
     try:
        text1 = TextSendMessage(text='<第一章> - 冒險的開始！')
        text2 = TextSendMessage(text='離開了新手村，你來到了一片森林，聽說這裡充滿了各種危險，你做好準備前進下去了嗎？')
+       #森林圖片
+       image_url = "https://i.imgur.com/mXblhcp.png"
+       image_message = ImageSendMessage(original_content_url=image_url, preview_image_url=image_url)
        flex_message1 = FlexSendMessage(
         alt_text='是否繼續',
         contents={
@@ -611,7 +615,7 @@ def sendback_1(event, backdata):
     #        contents=generate_carousel2(chapter) # 生成包含多個任務的 Carousel Flex Message
     #    )
 
-       line_bot_api.reply_message(event.reply_token, [text1, text2,flex_message1])
+       line_bot_api.reply_message(event.reply_token, [text1, text2,image_message,flex_message1])
 
     except:
        line_bot_api.reply_message(event.reply_token,TextSendMessage(text='不'))
@@ -622,12 +626,19 @@ def sendback_2(event, backdata):
        line_bot_api.reply_message(event.reply_token, [text])
     except:
        line_bot_api.reply_message(event.reply_token,TextSendMessage(text='不'))
+#逃跑的回覆
+def sendStoryBack(event, backdata):  
+    try:
+       text = TextSendMessage(text='先回村莊蒐集道具再來好了...')
+       line_bot_api.reply_message(event.reply_token, [text])
+    except:
+       line_bot_api.reply_message(event.reply_token,TextSendMessage(text='不'))
 
 def sendStoryNext(event, backdata): 
     try:
-       text1 = TextSendMessage(text='突然，一隻史萊姆出現在你的眼前，該怎麼做呢...')
-        # 圖片
-       image_url = "https://i.imgur.com/loFy9Ut.png"
+       text1 = TextSendMessage(text='突然，一隻看起來很餓的史萊姆出現在你的眼前，該怎麼做呢...')
+       #肚子餓史萊姆
+       image_url = "https://imgur.com/xG7uDJG.png"
        image_message = ImageSendMessage(original_content_url=image_url, preview_image_url=image_url)
        flex_message1 = FlexSendMessage(
         alt_text='是否使用道具',
@@ -762,21 +773,30 @@ def sendStoryItem(event):
     try:
         message = event.message.text
         gift_name = message.split("使用")[1].strip()  # 獲取道具名稱並去除前後空格
-
-        if gift_name == "盾牌":
-            response_message = "你使用了水果，史萊姆的顏色逐漸變化了！"
-            image_url = "https://i.imgur.com/loFy9Ut.png"  # 請替換為水果圖片的URL
-            congratulation_message = "他很喜歡，恭喜獲得一隻史萊姆！"
+        user_id = event.source.user_id  
+        user = users.objects.get(uid=user_id) 
+        if gift_name == "謎之藥水":
+            response_message = "你使用了謎之藥水，史萊姆的顏色逐漸變化了！"
+            image_url = "https://imgur.com/DRtcDGW.png"  # 生氣史萊姆
+            congratulation_message = "史萊姆生氣的攻擊了你，你的經驗值減少了5%。"
+            # 扣除经验值
+            experience_decrease = 5
+            user.experience -= experience_decrease
+            if user.experience <= 0:
+                user.level = 1
+                user.experience = 95
+            user.save()
             # 生成消息回覆
             messages = [
                 TextSendMessage(text=response_message),
                 ImageSendMessage(original_content_url=image_url, preview_image_url=image_url),
-                TextSendMessage(text=congratulation_message)
+                TextSendMessage(text=congratulation_message),
+                generate_experience_message(user, user.experience, user.level)  # 加入經驗值變化的 Flex Message
             ]
-        elif gift_name == "魔法藥水":
-            response_message = "你使用了魔法藥水，史萊姆縮水了！"
-            image_url = "https://i.imgur.com/loFy9Ut.png"  # 請替換為魔法藥水圖片的URL
-            dislike_message = "他不喜歡這個藥水，所以跑走了。"
+        elif gift_name == "軟綿綿果實":
+            response_message = "你使用了軟綿綿果實，史萊姆對你的好感度增加了！"
+            image_url = "https://imgur.com/Q7jNQtU.png"  # 開心史萊姆
+            dislike_message = "史萊姆很開心，決定帶你繼續前進（獲得同伴史萊姆）。"
             # 生成消息回覆
             messages = [
                 TextSendMessage(text=response_message),
@@ -1128,3 +1148,211 @@ def sendnickname(event,mtext):
     except Exception as e:
         print(f"Error sending mission: {e}")
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text='发生错误！'))
+
+
+ ###自我回顧
+def sendReview(event):
+    try:
+        user_id = event.source.user_id  
+        user = users.objects.get(uid=user_id)  
+
+        List = FlexSendMessage(
+            alt_text='自我回顧',
+            contents={
+            "type": "bubble",
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "自我回顧",
+                    "weight": "bold",
+                    "size": "xl"
+                },
+                {
+                    "type": "text",
+                    "text": "一天又過去了，有好好完成該做的事情嗎？",
+                    "size": "xs",
+                    "margin": "lg"
+                }
+                ]
+            },
+            "footer": {
+                "type": "box",
+                "layout": "vertical",
+                "spacing": "sm",
+                "contents": [
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "button",
+                        "action": {
+                        "type": "postback",
+                        "label": "今天有把該做的事都做完",
+                        "data": "hello"
+                        },
+                        "color": "#434343"
+                    }
+                    ],
+                    "margin": "sm",
+                    "backgroundColor": "#ADC6FF",
+                    "cornerRadius": "10px"
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "button",
+                        "action": {
+                        "type": "postback",
+                        "label": "差一點點就全部完成了",
+                        "data": "hello"
+                        },
+                        "color": "#434343"
+                    }
+                    ],
+                    "margin": "md",
+                    "backgroundColor": "#FFE58F",
+                    "cornerRadius": "10px"
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "button",
+                        "action": {
+                        "type": "postback",
+                        "label": "今天的進度跟想像中有點落差...",
+                        "data": "hello"
+                        },
+                        "color": "#434343"
+                    }
+                    ],
+                    "margin": "md",
+                    "backgroundColor": "#ADC6FF",
+                    "cornerRadius": "10px"
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "button",
+                        "action": {
+                        "type": "postback",
+                        "label": "放縱了自己一天...明天再努力吧",
+                        "data": "hello"
+                        },
+                        "color": "#434343"
+                    }
+                    ],
+                    "margin": "md",
+                    "backgroundColor": "#FFE58F",
+                    "cornerRadius": "10px"
+                }
+                ],
+                "flex": 0
+            }
+        }
+        )
+        line_bot_api.reply_message(event.reply_token, List)
+
+    except Exception as e:
+        print(f"Error sending mission: {e}")
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='發生錯誤！'))
+
+###任務整理
+def sendLeftList(event):
+    try:
+        List = FlexSendMessage(
+            alt_text='任務整理',
+            contents={
+                "type": "bubble",
+                "size": "hecto",
+                "header": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "準備考試",
+                        "size": "xl",
+                        "weight": "bold"
+                    }
+                    ],
+                    "paddingBottom": "md"
+                },
+                "body": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "學校"
+                    },
+                    {
+                        "type": "separator",
+                        "margin": "lg"
+                    }
+                    ],
+                    "paddingTop": "none",
+                    "paddingBottom": "none"
+                },
+                "footer": {
+                    "type": "box",
+                    "layout": "horizontal",
+                    "spacing": "sm",
+                    "contents": [
+                    {
+                        "type": "button",
+                        "style": "primary",
+                        "action": {
+                        "type": "message",
+                        "label": "繼續",
+                        "text": "當然要繼續啊！"
+                        },
+                        "color": "#597EF7"
+                    },
+                    {
+                        "type": "button",
+                        "action": {
+                        "type": "message",
+                        "label": "捨棄",
+                        "text": "捨棄"
+                        },
+                        "color": "#496496"
+                    }
+                    ]
+                },
+                "styles": {
+                    "body": {
+                    "separator": False
+                    }
+                }
+            }
+        )
+        line_bot_api.reply_message(event.reply_token, List)
+
+    except Exception as e:
+        print(f"Error sending mission: {e}")
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='發生錯誤！'))
+
+def sendContinue(event):  
+    try:
+       text = TextSendMessage(text='已添加入今日清單，今天繼續努力吧！')
+       line_bot_api.reply_message(event.reply_token, [text])
+    except:
+       line_bot_api.reply_message(event.reply_token,TextSendMessage(text='不'))
+
+def sendLeft(event):  
+    try:
+       text = TextSendMessage(text='已刪除該任務！')
+       line_bot_api.reply_message(event.reply_token, [text])
+    except:
+       line_bot_api.reply_message(event.reply_token,TextSendMessage(text='不'))
+

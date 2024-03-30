@@ -87,6 +87,14 @@ def callback(request):
                     func.sendStoryItem(event)
                 elif mtext == '成就列表':
                     func.sendList(event)
+                elif mtext == '自我回顧':
+                    func.sendReview(event)
+                elif mtext == '任務整理':
+                    func.sendLeftList(event)
+                elif mtext == '當然要繼續啊！':
+                    func.sendContinue(event)
+                elif mtext == '捨棄':
+                    func.sendLeft(event)
                 elif mtext == '我要選擇勇者！':
                     func.sendUsername(event)    
                 elif mtext.startswith('新增'):
