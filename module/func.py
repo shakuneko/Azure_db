@@ -518,7 +518,7 @@ def sendTimeBox(event):
     try:
         today_tasks = Task.objects.filter(date=date.today())  # 获取今天的任务列表
         if not today_tasks:
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='今天没有任务'))
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='今天還沒安排任務！'))
             return
         
         message = TextSendMessage(text='以下是今天的任務時間表')
@@ -539,7 +539,7 @@ def sendTimeBox(event):
 
     except Exception as e:
         print(f"Error sending mission: {e}")
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='发生错误！'))
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='發生錯誤！'))
 ###冒險故事
 def sendStory(event):
     try:
@@ -629,7 +629,7 @@ def sendback_2(event, backdata):
 #逃跑的回覆
 def sendStoryBack(event, backdata):  
     try:
-       text = TextSendMessage(text='先回村莊蒐集道具再來好了...')
+       text = TextSendMessage(text='回村莊蒐集道具後再來挑戰吧！')
        line_bot_api.reply_message(event.reply_token, [text])
     except:
        line_bot_api.reply_message(event.reply_token,TextSendMessage(text='不'))
@@ -785,6 +785,7 @@ def sendStoryItem(event):
             if user.experience <= 0:
                 user.level = 1
                 user.experience = 95
+                user.image_url = "https://i.imgur.com/Qk4cUGL.png"  # 将图片 URL 设置为 1 级对应的图片
             user.save()
             # 生成消息回覆
             messages = [
