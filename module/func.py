@@ -1135,9 +1135,9 @@ def sendnickname(event,mtext):
         user.save()
         reply_message = TextSendMessage(text=f'好的，{nickname}\n那麼接下來要進入新手教學的部分，如果看完有不懂的地方或是忘記的話，隨時點擊“新手教學”我就會再教你一次喔！')
         images = [
+            "https://imgur.com/cicOATM.png",
             "https://imgur.com/lrzzCB1.png",
             "https://imgur.com/UDTAWhX.png",
-            "https://imgur.com/cicOATM.png",
             "https://imgur.com/lTG4SQi.png",
             "https://imgur.com/Hd9dwxU.png",
             "https://imgur.com/rl4kn8q.png",
@@ -1154,9 +1154,9 @@ def sendnickname(event,mtext):
 def sendTeach(event):
     try:
         images = [
+            "https://imgur.com/cicOATM.png",
             "https://imgur.com/lrzzCB1.png",
             "https://imgur.com/UDTAWhX.png",
-            "https://imgur.com/cicOATM.png",
             "https://imgur.com/lTG4SQi.png",
             "https://imgur.com/Hd9dwxU.png",
             "https://imgur.com/rl4kn8q.png",
