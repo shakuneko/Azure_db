@@ -314,7 +314,7 @@ def get_gift(event):
         }
 
         # 回复用户
-        line_bot_api.reply_message(event.reply_token, FlexSendMessage(alt_text="禮物", contents=flex_message))
+        line_bot_api.reply_message(event.reply_token, FlexSendMessage(alt_text="獲得禮物", contents=flex_message))
     else:
         # 如果所有礼物都已经被用户获得，向用户发送消息提示
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text="您已經獲得了所有可用的禮物！"))
@@ -372,7 +372,7 @@ def generate_level_up_message(message, image_url):
 def generate_experience_message(user,experience_newpercentage,level):
     # 生成經驗值計算的 Flex Message
     return FlexSendMessage(
-        alt_text='經驗值計算',
+        alt_text='獲得經驗值',
         contents={
             "type": "bubble",
             "body": {
@@ -1144,7 +1144,7 @@ def sendnickname(event,mtext):
             "https://imgur.com/oHQdgW3.png",
         ]
         carousel_message = generate_carousel(images)
-        flex_message_object = FlexSendMessage(alt_text="carousel", contents=carousel_message)
+        flex_message_object = FlexSendMessage(alt_text="新手教學", contents=carousel_message)
         line_bot_api.reply_message(event.reply_token, [reply_message, flex_message_object])
     except Exception as e:
         print(f"Error sending mission: {e}")
