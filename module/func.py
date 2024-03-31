@@ -1091,7 +1091,7 @@ def sendUsername(event):
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text='发生错误！'))
 
 #圖片選轉木馬
-def generate_carousel(images):
+def generate_carousel_teach(images):
     carousel_contents = []
     for image_url in images:
         bubble = {
@@ -1143,7 +1143,7 @@ def sendnickname(event,mtext):
             "https://imgur.com/5tn2U7t.png",
             "https://imgur.com/oHQdgW3.png",
         ]
-        carousel_message = generate_carousel(images)
+        carousel_message = generate_carousel_teach(images)
         flex_message_object = FlexSendMessage(alt_text="新手教學", contents=carousel_message)
         line_bot_api.reply_message(event.reply_token, [reply_message, flex_message_object])
     except Exception as e:
@@ -1162,8 +1162,8 @@ def sendTeach(event):
             "https://imgur.com/5tn2U7t.png",
             "https://imgur.com/oHQdgW3.png",
         ]
-        carousel_message = generate_carousel(images)
-        flex_message_object = FlexSendMessage(alt_text="carousel", contents=carousel_message)
+        carousel_message = generate_carousel_teach(images)
+        flex_message_object = FlexSendMessage(alt_text="新手教學", contents=carousel_message)
         line_bot_api.reply_message(event.reply_token, [flex_message_object])
     except Exception as e:
         print(f"Error sending mission: {e}")
