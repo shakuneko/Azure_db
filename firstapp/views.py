@@ -46,7 +46,7 @@ def get_tasks(request):
 def get_item(request):
     if request.method == 'GET':
         items = UserGift.objects.all()
-        item_data = [{'item_name': item.gift.giftname, 'item_url': item.image_url,'description':item.description} for item in items]
+        item_data = [{'item_name': item.gift.giftname, 'item_url': item.image_url,'description':item.description,'used_gift':item.used_gift} for item in items]
         return JsonResponse(item_data, safe=False)
     else:
         return JsonResponse({'error': 'Only GET method allowed'})

@@ -39,8 +39,8 @@ class UserGift(models.Model):
     user = models.CharField(max_length=255)  # 假设您的用户ID是一个字符串类型
     gift = models.ForeignKey(Gift, on_delete=models.CASCADE)  # 关联到您的 Gift 模型
     image_url = models.URLField()
-    created_at = models.DateTimeField(auto_now_add=True)  # 自动记录创建时间
     description = models.CharField(max_length=100, default='')
+    used_gift = models.BooleanField(default=False)
 
 #紀錄完成的任務id
 class CompletedTask(models.Model):

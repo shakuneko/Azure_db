@@ -10,7 +10,7 @@ from linebot.models.flex_message import (
 )
 from firstapp.models import users,Task,Gift,UserGift,CompletedTask,UserLevel
 from linebot.models.actions import URIAction
-from datetime import datetime,date
+from datetime import datetime,date,timedelta
 import random
 from django.core.exceptions import ObjectDoesNotExist
 line_bot_api = LineBotApi(settings.LINE_CHANNEL_ACCESS_TOKEN)
@@ -215,15 +215,15 @@ def handle_postback(event):
     #刪除任務
     elif postback_data.startswith('action=incompleted'):
         task_id = postback_data.split('action=incompleted')[1] 
-        print("Received postback data:", postback_data)
-        print("Received postback data:", task_id)
         try:
             task = Task.objects.get(tid=task_id)
-            task.delete()
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='任務已刪除！'))
+            if task.completed:
+                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='該任務已經完成，無法刪除！'))
+            else:
+                task.delete()
+                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='任務已刪除！'))
         except Task.DoesNotExist:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='任務不存在'))
-
 def handle_all_tasks_completed(user_id):
     # 在這裡添加您希望在所有任務完成時執行的代碼
     text1 = TextSendMessage(text='\ 今天完成了三項任務 / \n點選寶箱來領取獎勵吧！')
@@ -491,51 +491,104 @@ def create_task_box(start_time, task_name, index):
         "cornerRadius": "30px",
         "margin": "md"
     }
-def create_time_schedule(today_tasks):
-    time_schedule_contents = []
+def create_time_schedule(date_range):
     all_times = ["06:00", "07:00", "08:00", "09:00", "10:00", "11:00",
                  "12:00", "13:00", "14:00", "15:00", "16:00", "17:00",
                  "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"]
     
-    for index, time_slot in enumerate(all_times):
-        task_names = []  # 用于存储時間槽内的任務名稱列表
-        for task in today_tasks:
-            task_time = task.time.strftime('%H:%M')  # 將任務時間轉換為字符串格式
-            if is_today(task.date) and task_time == time_slot:  # 判斷是否是今天的任務並且時間槽匹配
-                task_names.append(task.task_name)
+    time_schedule_contents = []
 
-        # 如果該時間槽內沒有任務，則將任務名稱設為空
-        if not task_names:
-            task_names = [" "]  # 使用空字符串填充
+    for date_to_display in date_range:
+        today_tasks = Task.objects.filter(date=date_to_display)
+        task_boxes = []
 
-        # 創建包含時間槽和任務名稱的任務框，並將其添加到時間表內容列表中
-        task_box = create_task_box(time_slot, ", ".join(task_names), index)
-        time_schedule_contents.append(task_box)
+        for index, time_slot in enumerate(all_times):
+            task_names = []  # 用于存储时间槽内的任务名称列表
+            for task in today_tasks:
+                task_time = task.time.strftime('%H:%M')  # 将任务时间转换为字符串格式
+                if task_time == time_slot:  # 判断时间槽匹配
+                    task_names.append(task.task_name)
+
+            # 如果该时间槽内没有任务，将任务名称设置为空字符串
+            if not task_names:
+                task_names = [" "]  # 使用空字符串填充
+
+            # 创建包含时间槽和任务名称的任务框，并添加到任务框列表中
+            task_box = create_task_box(time_slot, ", ".join(task_names), index)
+            task_boxes.append(task_box)
+
+        # 将当前日期的任务框列表添加到总的时间表内容列表中
+        time_schedule_contents.append(task_boxes)
 
     return time_schedule_contents
 
 def sendTimeBox(event):
     try:
-        today_tasks = Task.objects.filter(date=date.today())  # 获取今天的任务列表
-        if not today_tasks:
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='今天還沒安排任務！'))
-            return
-        
-        message = TextSendMessage(text='以下是今天的任務時間表')
-        time_schedule_contents = create_time_schedule(today_tasks)
-        message2 = FlexSendMessage(
-            alt_text='時間箱',
-            contents={
+        today = date.today()  # 获取今天日期
+        three_days_later = today + timedelta(days=2)  # 获取三天后的日期
+        date_range = [today + timedelta(days=i) for i in range(3)]  # 构建日期范围列表
+
+        # 自定义英文星期到中文星期的转换
+        day_mapping = {
+            "Mon": "一",
+            "Tue": "二",
+            "Wed": "三",
+            "Thu": "四",
+            "Fri": "五",
+            "Sat": "六",
+            "Sun": "日"
+        }
+
+        # 发送任务时间表的 FlexMessage
+        time_schedule_contents = create_time_schedule(date_range)
+        carousel_contents = []
+        for idx, task_boxes in enumerate(time_schedule_contents):
+            date_to_display = date_range[idx]
+            # 获取中文星期的表示
+            week_day_cn = day_mapping.get(date_to_display.strftime("%a"), "")  # 根据星期简称获取中文星期表示
+            date_display_text = date_to_display.strftime("%m/%d （%a）").replace(date_to_display.strftime("%a"), week_day_cn)  # 添加日期和星期（中文）
+            
+            bubble_content = {
                 "type": "bubble",
                 "size": "mega",
                 "body": {
                     "type": "box",
                     "layout": "vertical",
-                    "contents": time_schedule_contents
+                    "contents": [
+                        {
+                            "type": "box",
+                            "layout": "horizontal",
+                            "contents": [
+                                {
+                                    "type": "text",
+                                    "text": date_display_text,  # 添加日期和星期
+                                    "gravity": "center",
+                                    "size": "sm",
+                                    "align": "center",
+                                    "margin": "none"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "separator",  # 添加分隔线
+                            "margin": "md"
+                        },
+                        *task_boxes  # 添加任务时间表的内容
+                    ]
                 }
             }
+            carousel_contents.append(bubble_content)
+        message = TextSendMessage(text='以下是近三天的任務時間表')
+        flex_message = FlexSendMessage(
+            alt_text='時間箱',
+            contents={
+                "type": "carousel",
+                "contents": carousel_contents
+            }
         )
-        line_bot_api.reply_message(event.reply_token, [message, message2])
+
+        # 发送 FlexMessage
+        line_bot_api.reply_message(event.reply_token, [message,flex_message])
 
     except Exception as e:
         print(f"Error sending mission: {e}")
@@ -543,21 +596,98 @@ def sendTimeBox(event):
 ###冒險故事
 def sendStory(event):
     try:
-        # 快速回覆按鈕
+        # 提示信息
         message = TextSendMessage(
-           text='點擊下方按鈕選擇想看的章節吧！\n(如未達到特定等級將無法觀看後續內容)',
-        quick_reply=QuickReply(items=[
-                QuickReplyButton(action=PostbackAction(label="第一章", text="第一章",data='action=第一章')),
-                QuickReplyButton(action=PostbackAction(label="第二章", text="第二章",data='action=第二章')),
-                QuickReplyButton(action=PostbackAction(label="第三章", text="第三章",data='action=第三章')),
-                QuickReplyButton(action=PostbackAction(label="第四章", text="第四章",data='action=第四章')),
-                QuickReplyButton(action=PostbackAction(label="第五章", text="第五章",data='action=第五章')),
-            ]))
-        # 發送消息
-        line_bot_api.reply_message(event.reply_token,message)
+            text='點擊下方按鈕選擇想看的章節吧！\n(如未達到特定等級將無法觀看後續內容)'
+        )
 
-    except:
-        line_bot_api.reply_message(event.reply_token,TextSendMessage(text='不'))
+        # 构建 Carousel Flex Message
+        carousel_contents = [
+            BubbleContainer(
+                hero=ImageComponent(
+                    type="image",
+                    size="full",
+                    aspect_ratio="20:13",
+                    aspect_mode="cover",
+                    url="https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_5_carousel.png"
+                ),
+                footer=BoxComponent(
+                    type="box",
+                    layout="vertical",
+                    spacing="sm",
+                    contents=[
+                        ButtonComponent(
+                            type="button",
+                            action=PostbackAction(
+                                type="postback",
+                                label="第一章",
+                                data="action=第一章"
+                            )
+                        )
+                    ]
+                )
+            ),
+            BubbleContainer(
+                hero=ImageComponent(
+                    type="image",
+                    size="full",
+                    aspect_ratio="20:13",
+                    aspect_mode="cover",
+                    url="https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_5_carousel.png"
+                ),
+                footer=BoxComponent(
+                    type="box",
+                    layout="vertical",
+                    spacing="sm",
+                    contents=[
+                        ButtonComponent(
+                            type="button",
+                            action=PostbackAction(
+                                type="postback",
+                                label="第二章",
+                                data="action=第二章"
+                            )
+                        )
+                    ]
+                )
+            ),
+            BubbleContainer(
+                hero=ImageComponent(
+                    type="image",
+                    size="full",
+                    aspect_ratio="20:13",
+                    aspect_mode="cover",
+                    url="https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_5_carousel.png"
+                ),
+                footer=BoxComponent(
+                    type="box",
+                    layout="vertical",
+                    spacing="sm",
+                    contents=[
+                        ButtonComponent(
+                            type="button",
+                            action=PostbackAction(
+                                type="postback",
+                                label="第三章",
+                                data="action=第三章"
+                            )
+                        )
+                    ]
+                )
+            )
+        ]
+        
+        flex_message = FlexSendMessage(
+            alt_text='章節選擇',
+            contents=CarouselContainer(contents=carousel_contents)
+        )
+
+        # 发送提示信息和 FlexMessage
+        line_bot_api.reply_message(event.reply_token, [message, flex_message])
+
+    except Exception as e:
+        print(f"Error sending story: {e}")
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='發生錯誤！'))
         
 def sendback_1(event, backdata):  
     try:
@@ -775,38 +905,44 @@ def sendStoryItem(event):
         gift_name = message.split("使用")[1].strip()  # 獲取道具名稱並去除前後空格
         user_id = event.source.user_id  
         user = users.objects.get(uid=user_id) 
-        if gift_name == "謎之藥水":
-            response_message = "你使用了謎之藥水，史萊姆的顏色逐漸變化了！"
-            image_url = "https://imgur.com/DRtcDGW.png"  # 生氣史萊姆
-            congratulation_message = "史萊姆生氣的攻擊了你，你的經驗值減少了5%。"
-            # 扣除经验值
-            experience_decrease = 5
-            user.experience -= experience_decrease
-            if user.experience <= 0:
-                user.level = 1
-                user.experience = 95
-                user.image_url = "https://i.imgur.com/Qk4cUGL.png"  # 将图片 URL 设置为 1 级对应的图片
-            user.save()
-            # 生成消息回覆
-            messages = [
-                TextSendMessage(text=response_message),
-                ImageSendMessage(original_content_url=image_url, preview_image_url=image_url),
-                TextSendMessage(text=congratulation_message),
-                generate_experience_message(user, user.experience, user.level)  # 加入經驗值變化的 Flex Message
-            ]
-        elif gift_name == "軟綿綿果實":
-            response_message = "你使用了軟綿綿果實，史萊姆對你的好感度增加了！"
-            image_url = "https://imgur.com/Q7jNQtU.png"  # 開心史萊姆
-            dislike_message = "史萊姆很開心，決定帶你繼續前進（獲得同伴史萊姆）。"
-            # 生成消息回覆
-            messages = [
-                TextSendMessage(text=response_message),
-                ImageSendMessage(original_content_url=image_url, preview_image_url=image_url),
-                TextSendMessage(text=dislike_message)
-            ]
-        else:
-            response_message = "你使用了未知的道具。"
-            messages = [TextSendMessage(text=response_message)]
+        user_gifts = UserGift.objects.filter(user=user_id, gift__giftname=gift_name)  # 过滤出用户和指定礼物名称的 UserGift 对象
+        if user_gifts.exists():
+            for user_gift in user_gifts:
+                user_gift.used_gift = True
+                user_gift.save() 
+            if gift_name == "謎之藥水":
+                response_message = "你使用了謎之藥水，史萊姆的顏色逐漸變化了！"
+                image_url = "https://imgur.com/DRtcDGW.png"  # 生氣史萊姆
+                congratulation_message = "史萊姆生氣的攻擊了你，你的經驗值減少了5%。"
+                # 扣除经验值
+                experience_decrease = 5
+                user.experience -= experience_decrease
+                if user.experience <= 0:
+                    user.level = 1
+                    user.experience = 95
+                    user.image_url = "https://i.imgur.com/Qk4cUGL.png"  # 将图片 URL 设置为 1 级对应的图片
+                user.save()
+                # 生成消息回覆
+                messages = [
+                    TextSendMessage(text=response_message),
+                    ImageSendMessage(original_content_url=image_url, preview_image_url=image_url),
+                    TextSendMessage(text=congratulation_message),
+                    generate_experience_message(user, user.experience, user.level)  # 加入經驗值變化的 Flex Message
+                ]
+            elif gift_name == "軟綿綿果實":
+                response_message = "你使用了軟綿綿果實，史萊姆對你的好感度增加了！"
+                image_url = "https://imgur.com/Q7jNQtU.png"  # 開心史萊姆
+                dislike_message = "史萊姆很開心，決定帶你繼續前進（獲得同伴史萊姆）。"
+            
+                # 生成消息回覆
+                messages = [
+                    TextSendMessage(text=response_message),
+                    ImageSendMessage(original_content_url=image_url, preview_image_url=image_url),
+                    TextSendMessage(text=dislike_message)
+                ]
+            else:
+                response_message = "你使用了未知的道具。"
+                messages = [TextSendMessage(text=response_message)]
 
         line_bot_api.reply_message(event.reply_token, messages)
     except Exception as e:
@@ -1051,11 +1187,10 @@ def manageForm(event, mtext):
                             {
                                 "type": "button",
                                 "action": {
-                                    "type": "message",
+                                    "type": "postback",
                                     "label": "修改",
-                                    "text": "hello"
+                                    "data": "action=nothing" 
                                 },
-                                "margin": "xs"
                             }
                         ],
                         "spacing": "sm",

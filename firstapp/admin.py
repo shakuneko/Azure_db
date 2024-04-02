@@ -16,7 +16,7 @@ class GiftAdmin(admin.ModelAdmin):
 admin.site.register(Gift, GiftAdmin)
 
 class UserGiftAdmin(admin.ModelAdmin):
-    list_display=('user','gift','created_at','image_url','description')
+    list_display=('user','gift','used_gift','image_url','description')
 admin.site.register(UserGift, UserGiftAdmin)
 
 class CompletedTaskAdmin(admin.ModelAdmin):
