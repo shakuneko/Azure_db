@@ -370,6 +370,19 @@ def generate_level_up_message(message, image_url):
         }
     )
 def generate_experience_message(user,experience_newpercentage,level):
+     #  根據等級變換進度條顏色
+    if level == 1:
+        progress_bar_color = "#BFBFBF"  # 灰色
+        background_color = "#F0F0F0"
+        
+    elif level == 2:
+        progress_bar_color = "#597EF7"  # 蓝色
+        background_color = "#D6E4FF" 
+        
+    else:
+        progress_bar_color = "#FFD666"  # 黃色
+        background_color = "#FFFAE3" 
+
     # 生成經驗值計算的 Flex Message
     return FlexSendMessage(
         alt_text='獲得經驗值',
@@ -412,13 +425,13 @@ def generate_experience_message(user,experience_newpercentage,level):
                                 "layout": "vertical",
                                 "contents": [],
                                 "width": f"{experience_newpercentage}%",
-                                "backgroundColor": "#597EF7",
+                                "backgroundColor": progress_bar_color,
                                 "height": "15px",
                                 "cornerRadius": "10px"
                             }
                         ],
                         "margin": "md",
-                        "backgroundColor": "#D6E4FF",
+                        "backgroundColor": background_color,
                         "height": "15px",
                         "cornerRadius": "10px"
                     }
@@ -609,7 +622,7 @@ def sendStory(event):
                     size="full",
                     aspect_ratio="20:13",
                     aspect_mode="cover",
-                    url="https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_5_carousel.png"
+                    url="https://imgur.com/rEGBUYT.png"
                 ),
                 footer=BoxComponent(
                     type="box",
@@ -633,7 +646,7 @@ def sendStory(event):
                     size="full",
                     aspect_ratio="20:13",
                     aspect_mode="cover",
-                    url="https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_5_carousel.png"
+                    url="https://imgur.com/D2vpSnA.png"
                 ),
                 footer=BoxComponent(
                     type="box",
@@ -657,7 +670,7 @@ def sendStory(event):
                     size="full",
                     aspect_ratio="20:13",
                     aspect_mode="cover",
-                    url="https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_5_carousel.png"
+                    url="https://imgur.com/D2vpSnA.png"
                 ),
                 footer=BoxComponent(
                     type="box",
@@ -1270,14 +1283,14 @@ def sendnickname(event,mtext):
         user.save()
         reply_message = TextSendMessage(text=f'好的，{nickname}\n那麼接下來要進入新手教學的部分，如果看完有不懂的地方或是忘記的話，隨時點擊“新手教學”我就會再教你一次喔！')
         images = [
-            "https://imgur.com/cicOATM.png",
-            "https://imgur.com/lrzzCB1.png",
-            "https://imgur.com/UDTAWhX.png",
-            "https://imgur.com/lTG4SQi.png",
-            "https://imgur.com/Hd9dwxU.png",
-            "https://imgur.com/rl4kn8q.png",
-            "https://imgur.com/5tn2U7t.png",
-            "https://imgur.com/oHQdgW3.png",
+            "https://imgur.com/yqBMCJT.png",
+            "https://imgur.com/IjTlls0.png",
+            "https://imgur.com/JcturVG.png",
+            "https://imgur.com/9n3OzeJ.png",
+            "https://imgur.com/3maqHqM.png",
+            "https://imgur.com/U09kzi8.png",
+            "https://imgur.com/HOsP8Tu.png",
+            "https://imgur.com/QgVyyrv.png",
         ]
         carousel_message = generate_carousel_teach(images)
         flex_message_object = FlexSendMessage(alt_text="新手教學", contents=carousel_message)
@@ -1289,14 +1302,14 @@ def sendnickname(event,mtext):
 def sendTeach(event):
     try:
         images = [
-            "https://imgur.com/cicOATM.png",
-            "https://imgur.com/lrzzCB1.png",
-            "https://imgur.com/UDTAWhX.png",
-            "https://imgur.com/lTG4SQi.png",
-            "https://imgur.com/Hd9dwxU.png",
-            "https://imgur.com/rl4kn8q.png",
-            "https://imgur.com/5tn2U7t.png",
-            "https://imgur.com/oHQdgW3.png",
+            "https://imgur.com/yqBMCJT.png",
+            "https://imgur.com/IjTlls0.png",
+            "https://imgur.com/JcturVG.png",
+            "https://imgur.com/9n3OzeJ.png",
+            "https://imgur.com/3maqHqM.png",
+            "https://imgur.com/U09kzi8.png",
+            "https://imgur.com/HOsP8Tu.png",
+            "https://imgur.com/QgVyyrv.png",
         ]
         carousel_message = generate_carousel_teach(images)
         flex_message_object = FlexSendMessage(alt_text="新手教學", contents=carousel_message)
