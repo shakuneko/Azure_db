@@ -1283,14 +1283,14 @@ def sendnickname(event,mtext):
         user.save()
         reply_message = TextSendMessage(text=f'好的，{nickname}\n那麼接下來要進入新手教學的部分，如果看完有不懂的地方或是忘記的話，隨時點擊“新手教學”我就會再教你一次喔！')
         images = [
-            "https://imgur.com/yqBMCJT.png",
-            "https://imgur.com/IjTlls0.png",
-            "https://imgur.com/JcturVG.png",
-            "https://imgur.com/9n3OzeJ.png",
-            "https://imgur.com/3maqHqM.png",
-            "https://imgur.com/U09kzi8.png",
-            "https://imgur.com/HOsP8Tu.png",
-            "https://imgur.com/QgVyyrv.png",
+            "https://imgur.com/omfjK8F.png", #新增任務
+            "https://imgur.com/7AGA0E0.png", #今日任務
+            "https://imgur.com/wAVX9EM.png",
+            "https://imgur.com/ZVNUmFq.png", #時間箱
+            "https://imgur.com/rzmXlT5.png", #冒險故事
+            "https://imgur.com/7bx9lnV.png", #成就列表
+            "https://imgur.com/E87ArXO.png",
+            "https://imgur.com/ho538O6.png", #推播功能
         ]
         carousel_message = generate_carousel_teach(images)
         flex_message_object = FlexSendMessage(alt_text="新手教學", contents=carousel_message)
@@ -1302,14 +1302,14 @@ def sendnickname(event,mtext):
 def sendTeach(event):
     try:
         images = [
-            "https://imgur.com/yqBMCJT.png",
-            "https://imgur.com/IjTlls0.png",
-            "https://imgur.com/JcturVG.png",
-            "https://imgur.com/9n3OzeJ.png",
-            "https://imgur.com/3maqHqM.png",
-            "https://imgur.com/U09kzi8.png",
-            "https://imgur.com/HOsP8Tu.png",
-            "https://imgur.com/QgVyyrv.png",
+            "https://imgur.com/omfjK8F.png", #新增任務
+            "https://imgur.com/7AGA0E0.png", #今日任務
+            "https://imgur.com/wAVX9EM.png",
+            "https://imgur.com/ZVNUmFq.png", #時間箱
+            "https://imgur.com/rzmXlT5.png", #冒險故事
+            "https://imgur.com/7bx9lnV.png", #成就列表
+            "https://imgur.com/E87ArXO.png",
+            "https://imgur.com/ho538O6.png", #推播功能
         ]
         carousel_message = generate_carousel_teach(images)
         flex_message_object = FlexSendMessage(alt_text="新手教學", contents=carousel_message)
