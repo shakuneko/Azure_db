@@ -945,7 +945,7 @@ def sendStoryItem(event):
             elif gift_name == "軟綿綿果實":
                 response_message = "你使用了軟綿綿果實，史萊姆對你的好感度增加了！"
                 image_url = "https://imgur.com/Q7jNQtU.png"  # 開心史萊姆
-                dislike_message = "史萊姆很開心，決定帶你繼續前進（獲得同伴史萊姆）。"
+                dislike_message = "史萊姆很開心，決定帶你繼續前進探索森林。"
             
                 # 生成消息回覆
                 messages = [
