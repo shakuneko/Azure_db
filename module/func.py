@@ -148,7 +148,7 @@ def is_today(task_date):
 
 def sendMission(event):
     try:
-        tasks = Task.objects.filter(date=date.today(), completed=False)  # 获取今天未完成的任务
+        tasks = Task.objects.filter(date=date.today(), completed=False)  # 獲取今天未完成的任務
         if tasks:
             message = TextSendMessage(
                 text='以下是今日任務',
@@ -173,12 +173,12 @@ def handle_postback(event):
             task = Task.objects.get(tid=task_id)
             user_id = event.source.user_id  
             user = users.objects.get(uid=user_id)  
-            if not task.completed:  # 检查任务是否已经完成
+            if not task.completed:  # 檢查任務有沒有完成
                 task.completed = True
                 task.save()
                 experience_gained = 20
-                update_experience(user, experience_gained)  # 更新用户的经验值
-                experience_newpercentage = user.experience  # 获取用户当前的经验值百分比
+                update_experience(user, experience_gained)  # 更新用戶的經驗值
+                experience_newpercentage = user.experience  # 獲取當前的經驗值百分比
                 level = user.level
                 # 隨機恭喜句子
                 congrats_messages = [
@@ -190,7 +190,7 @@ def handle_postback(event):
 
                 if user.level > 1 and user.experience == 0:
                     message = f'恭喜！升级到 {user.level}等了！\n快到成就列表查看狀態吧！'
-                    image_url = user.image_url  # 新的级别图片URL
+                    image_url = user.image_url  # 新等級圖片
                     flex_message = generate_level_up_message(message, image_url)
                     message2 = generate_experience_message(user,experience_newpercentage, level)
                     line_bot_api.reply_message(event.reply_token, [flex_message,message2])
@@ -202,7 +202,7 @@ def handle_postback(event):
                 completed_task_count = Task.objects.filter(completed=True).count()
                 if completed_task_count >= 3 and not user.reward_claimed:
                     handle_all_tasks_completed(event.source.user_id)
-                    # 更新用户已领取奖励的标志
+                    # 更新用戶已領取獎勵
                     user.reward_claimed = True
                     user.save()
                         
@@ -225,7 +225,7 @@ def handle_postback(event):
         except Task.DoesNotExist:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='任務不存在'))
 def handle_all_tasks_completed(user_id):
-    # 在這裡添加您希望在所有任務完成時執行的代碼
+    # 所有任務完成時執行
     text1 = TextSendMessage(text='\ 今天完成了三項任務 / \n點選寶箱來領取獎勵吧！')
     flex_message = {
         "type": "bubble",
@@ -242,30 +242,27 @@ def handle_all_tasks_completed(user_id):
             }
         }
     }
-    # 发送文本消息和 Flex Message
     line_bot_api.push_message(user_id, [text1, FlexSendMessage(alt_text="開啟寶箱", contents=flex_message)])
 
 
 def get_gift(event):
-    # 获取用户已经获得的所有礼物
+    # 以取得所有禮物
     user_gifts = UserGift.objects.filter(user=event.source.user_id)
     user_gift_names = set(user_gift.gift.giftname for user_gift in user_gifts)
     user_gift_url = set(user_gift.gift.image_url for user_gift in user_gifts)
-    # 获取所有礼物，并排除用户已经获得的礼物
+    # 排除已獲得的禮物
     available_gifts = Gift.objects.exclude(giftname__in=user_gift_names)
 
-    # 如果还有可用的礼物
+    # 還有禮物的時候
     if available_gifts.exists():
-        # 从剩余的礼物中随机选择一个
+        # 從剩餘的隨機選一個
         selected_gift = random.choice(available_gifts)
-        # 创建一个 UserGift 实例，将其与用户关联并保存到数据库中
         user_gift = UserGift.objects.create(user=event.source.user_id, gift=selected_gift,image_url=selected_gift.image_url,description=selected_gift.description)
         user_gift.save()
         # 更新用戶的reward_claimed屬性為True，表示用戶已經領取了獎勵
         user = users.objects.get(uid=event.source.user_id)
         user.reward_claimed = True
         user.save()
-        # 创建 Flex Message 以回复用户
         flex_message = {
             "type": "bubble",
             "header": {
@@ -313,10 +310,9 @@ def get_gift(event):
             }
         }
 
-        # 回复用户
         line_bot_api.reply_message(event.reply_token, FlexSendMessage(alt_text="獲得禮物", contents=flex_message))
     else:
-        # 如果所有礼物都已经被用户获得，向用户发送消息提示
+        # 顯示已經領取所有禮物
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text="您已經獲得了所有可用的禮物！"))
 # def calculate_experience_percentage(completed_tasks):
 #     # 根據完成的任務數量計算經驗值增加的百分比
@@ -330,9 +326,9 @@ def get_gift(event):
 #判斷經驗值
 def update_experience(user, experience_gained):
     user.experience += experience_gained
-    if user.experience >= 100:  # 假设达到100经验值时升级
+    if user.experience >= 100:  # 經驗值達到100後升級
         user.level += 1
-        user.experience = user.experience % 100  # 减去升级所需的经验值
+        user.experience = user.experience % 100  
 
         # 更新等級照片
         new_level_image_url = UserLevel.objects.get(level=user.level).image_url
@@ -340,7 +336,6 @@ def update_experience(user, experience_gained):
 
     user.save()
 def generate_level_up_message(message, image_url):
-    # 生成包含升级信息和图片的 Flex Message
     return FlexSendMessage(
         alt_text='升级通知',
         contents={
@@ -516,32 +511,30 @@ def create_time_schedule(date_range):
         task_boxes = []
 
         for index, time_slot in enumerate(all_times):
-            task_names = []  # 用于存储时间槽内的任务名称列表
+            task_names = []  # 時間箱內的列表名稱
             for task in today_tasks:
-                task_time = task.time.strftime('%H:%M')  # 将任务时间转换为字符串格式
-                if task_time == time_slot:  # 判断时间槽匹配
+                task_time = task.time.strftime('%H:%M')  # 時間轉成字串
+                if task_time == time_slot:  # 任務跟時間配對
                     task_names.append(task.task_name)
 
-            # 如果该时间槽内没有任务，将任务名称设置为空字符串
+            # 沒任務得時候顯示空自串
             if not task_names:
-                task_names = [" "]  # 使用空字符串填充
+                task_names = [" "]  
 
-            # 创建包含时间槽和任务名称的任务框，并添加到任务框列表中
             task_box = create_task_box(time_slot, ", ".join(task_names), index)
             task_boxes.append(task_box)
 
-        # 将当前日期的任务框列表添加到总的时间表内容列表中
         time_schedule_contents.append(task_boxes)
 
     return time_schedule_contents
 
 def sendTimeBox(event):
     try:
-        today = date.today()  # 获取今天日期
-        three_days_later = today + timedelta(days=2)  # 获取三天后的日期
-        date_range = [today + timedelta(days=i) for i in range(3)]  # 构建日期范围列表
+        today = date.today()  
+        three_days_later = today + timedelta(days=2)  
+        date_range = [today + timedelta(days=i) for i in range(3)]  
 
-        # 自定义英文星期到中文星期的转换
+        # 自定義英文星期到中文星期的轉換
         day_mapping = {
             "Mon": "一",
             "Tue": "二",
@@ -552,13 +545,11 @@ def sendTimeBox(event):
             "Sun": "日"
         }
 
-        # 发送任务时间表的 FlexMessage
         time_schedule_contents = create_time_schedule(date_range)
         carousel_contents = []
         for idx, task_boxes in enumerate(time_schedule_contents):
             date_to_display = date_range[idx]
-            # 获取中文星期的表示
-            week_day_cn = day_mapping.get(date_to_display.strftime("%a"), "")  # 根据星期简称获取中文星期表示
+            week_day_cn = day_mapping.get(date_to_display.strftime("%a"), "")  
             date_display_text = date_to_display.strftime("%m/%d （%a）").replace(date_to_display.strftime("%a"), week_day_cn)  # 添加日期和星期（中文）
             
             bubble_content = {
@@ -600,7 +591,6 @@ def sendTimeBox(event):
             }
         )
 
-        # 发送 FlexMessage
         line_bot_api.reply_message(event.reply_token, [message,flex_message])
 
     except Exception as e:
@@ -614,7 +604,6 @@ def sendStory(event):
             text='點擊下方按鈕選擇想看的章節吧！\n(如未達到特定等級將無法觀看後續內容)'
         )
 
-        # 构建 Carousel Flex Message
         carousel_contents = [
             BubbleContainer(
                 hero=ImageComponent(
@@ -695,7 +684,6 @@ def sendStory(event):
             contents=CarouselContainer(contents=carousel_contents)
         )
 
-        # 发送提示信息和 FlexMessage
         line_bot_api.reply_message(event.reply_token, [message, flex_message])
 
     except Exception as e:
@@ -886,7 +874,7 @@ def sendStoryUseItem(event, backdata):
                                     "action": {
                                         "type": "message",
                                         "label": "使用",
-                                        "text": f"使用{user_gift.gift.giftname}"  # 不同道具的標識
+                                        "text": f"使用{user_gift.gift.giftname}"  # 不同道具的標示
                                     },
                                     "color": "#ffffff"
                                 }
@@ -918,7 +906,7 @@ def sendStoryItem(event):
         gift_name = message.split("使用")[1].strip()  # 獲取道具名稱並去除前後空格
         user_id = event.source.user_id  
         user = users.objects.get(uid=user_id) 
-        user_gifts = UserGift.objects.filter(user=user_id, gift__giftname=gift_name)  # 过滤出用户和指定礼物名称的 UserGift 对象
+        user_gifts = UserGift.objects.filter(user=user_id, gift__giftname=gift_name)  # 過濾出用戶和指定禮物名稱的 UserGift 對象
         if user_gifts.exists():
             for user_gift in user_gifts:
                 user_gift.used_gift = True
@@ -927,15 +915,14 @@ def sendStoryItem(event):
                 response_message = "你使用了謎之藥水，史萊姆的顏色逐漸變化了！"
                 image_url = "https://imgur.com/DRtcDGW.png"  # 生氣史萊姆
                 congratulation_message = "史萊姆生氣的攻擊了你，你的經驗值減少了5%。"
-                # 扣除经验值
+                # 扣除經驗值
                 experience_decrease = 5
                 user.experience -= experience_decrease
                 if user.experience <= 0:
                     user.level = 1
                     user.experience = 95
-                    user.image_url = "https://i.imgur.com/Qk4cUGL.png"  # 将图片 URL 设置为 1 级对应的图片
+                    user.image_url = "https://i.imgur.com/Qk4cUGL.png"  # 圖片變回一等
                 user.save()
-                # 生成消息回覆
                 messages = [
                     TextSendMessage(text=response_message),
                     ImageSendMessage(original_content_url=image_url, preview_image_url=image_url),
@@ -1271,14 +1258,13 @@ def generate_carousel_teach(images):
 def sendnickname(event,mtext):
     try:
         user_id = event.source.user_id
-        # 检查用户是否存在，如果不存在则创建用户
         if not users.objects.filter(uid=user_id).exists():
-            user = users.objects.create(uid=user_id, nickname='')  # 初始化 nickname 为空字符串
+            user = users.objects.create(uid=user_id, nickname='')  # 初始化 nickname 為空字符串
         else:
             user = users.objects.get(uid=user_id)
         
-        # 在这里保存暱稱到用户对象中
-        nickname = mtext[3:].strip()  # 取得使用者輸入的暱稱部分，并移除首尾空格
+        # 在這里保存暱稱到用戶對象中
+        nickname = mtext[3:].strip()  # 取得使用者輸入的暱稱部分，並移除首尾空格
         user.nickname = nickname
         user.save()
         reply_message = TextSendMessage(text=f'好的，{nickname}\n那麼接下來要進入新手教學的部分，如果看完有不懂的地方或是忘記的話，隨時點擊“新手教學”我就會再教你一次喔！')
@@ -1316,7 +1302,7 @@ def sendTeach(event):
         line_bot_api.reply_message(event.reply_token, [flex_message_object])
     except Exception as e:
         print(f"Error sending mission: {e}")
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='发生错误！'))
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='發生錯誤！'))
 
  ###自我回顧
 def sendReview(event):

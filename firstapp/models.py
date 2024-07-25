@@ -20,7 +20,7 @@ class Task(models.Model):
     time = models.TimeField(max_length=50,null=True, blank=True)
     date = models.DateField(max_length=50,null=True, blank=True)
     category = models.CharField(max_length=100, null=True, blank=True)
-    completed = models.BooleanField(default=False)  # 新增字段表示任务是否完成
+    completed = models.BooleanField(default=False)  
 
     def __str__(self):
         return self.tid
@@ -36,8 +36,8 @@ class Gift(models.Model):
 
 #紀錄拿到的禮物
 class UserGift(models.Model):
-    user = models.CharField(max_length=255)  # 假设您的用户ID是一个字符串类型
-    gift = models.ForeignKey(Gift, on_delete=models.CASCADE)  # 关联到您的 Gift 模型
+    user = models.CharField(max_length=255)  
+    gift = models.ForeignKey(Gift, on_delete=models.CASCADE)  
     image_url = models.URLField()
     description = models.CharField(max_length=100, default='')
     used_gift = models.BooleanField(default=False)
