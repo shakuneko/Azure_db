@@ -189,7 +189,7 @@ def handle_postback(event):
                 congrats_message = random.choice(congrats_messages)
 
                 if user.level > 1 and user.experience == 0:
-                    message = f'恭喜！升级到 {user.level}等了！\n快到成就列表查看狀態吧！'
+                    message = f'恭喜！升級到 {user.level}等了！\n快到成就列表查看狀態吧！'
                     image_url = user.image_url  # 新等級圖片
                     flex_message = generate_level_up_message(message, image_url)
                     message2 = generate_experience_message(user,experience_newpercentage, level)
